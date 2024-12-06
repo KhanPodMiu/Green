@@ -1,4 +1,4 @@
-name: Auto Commit
+name: Auto Commit with Debugging
 
 on:
   schedule:
@@ -10,11 +10,11 @@ jobs:
   commit:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
+      # Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Make a dummy commit
+      # Make a dummy commit
       - name: Make a Dummy Commit
         run: |
           echo "Auto commit at $(date)" >> auto-green.log
@@ -23,10 +23,20 @@ jobs:
           git add auto-green.log
           git commit -m "Auto commit to keep the green streak" || echo "No changes to commit"
 
-      # Step 3: Authenticate and push changes
+      # Debugging Git Configuration & Token
+      - name: Debug Information
+        run: |
+          git status
+          git remote -v
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Repository: ${{ github.repository }}"
+          echo "Token Available: ${{ secrets.GITHUB_TOKEN }}"
+
+      # Set remote URL with token and attempt push
       - name: Push Changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "Setting remote with token..."
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git push origin main
+          git push -u origin main
