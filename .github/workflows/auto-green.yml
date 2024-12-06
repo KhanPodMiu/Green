@@ -1,0 +1,31 @@
+name: Auto Commit
+
+on:
+  schedule:
+    # Runs every day at 6 AM UTC (adjust as needed)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Create or modify a file (to make a commit)
+      - name: Make a Dummy Commit
+        run: |
+          echo "Auto commit at $(date)" >> auto-green.log
+          git config --global user.name "KhanPodMiu"
+          git config --global user.email "miupod.3006@gmail.com"
+          git add auto-green.log
+          git commit -m "Auto commit to keep the green streak" || echo "No changes to commit"
+
+      # Step 3: Push changes back to the repository
+      - name: Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin main
